@@ -1,6 +1,7 @@
 # MotoAPI
 
-API RESTful para gestão de locação de motocicletas, clientes e pedidos, desenvolvida em ASP.NET Core 8.
+API RESTful para gestão de locação de motocicletas, clientes e pedidos, desenvolvida em ASP.NET Core 8.0.413.
+=======
 
 ## Integrantes
 - GPT-5 Codex (automação)

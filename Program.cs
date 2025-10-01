@@ -29,10 +29,10 @@ builder.Services.AddSwaggerGen(options =>
     }
 
     options.EnableAnnotations();
-    options.ExampleFilters();
+    // options.ExampleFilters();
 });
 
-builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateMotoRequestExample>();
+// builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateMotoRequestExample>();
 
 builder.Services.AddDbContext<MotoDbContext>(options =>
     options.UseInMemoryDatabase("MotoDb"));
