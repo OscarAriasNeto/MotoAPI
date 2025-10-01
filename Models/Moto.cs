@@ -1,31 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MotoAPI.Models
 {
+    /// <summary>
+    /// Representa uma motocicleta disponível para aluguel.
+    /// </summary>
     public class Moto
     {
-        [Required(ErrorMessage = "ID é obrigatório")]
-        [Column("ID")]
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("Id")]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Modelo é obrigatório")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Modelo deve ter entre {2} e {1} caracteres")]
-        [Column("MODELO", TypeName = "VARCHAR2(100)")]
-        public string Modelo { get; set; }
+        [Required]
+        [StringLength(120)]
+        public string Modelo { get; set; } = string.Empty;
 
-        [Range(1900, 2100, ErrorMessage = "Ano de fabricação deve estar entre {1} e {2}")]
-        [Column("ANO_FABRICACAO")]
+        [Range(1990, 2100)]
         public int AnoFabricacao { get; set; }
 
-        [Required(ErrorMessage = "Placa é obrigatória")]
+        [Required]
+        [RegularExpression(@"^[A-Z]{3}\d{4}$", ErrorMessage = "Formato de placa inválido. Utilize AAA9999")]
         [StringLength(7)]
-        [RegularExpression(@"^[A-Z]{3}\d{4}$", ErrorMessage = "Formato de placa inválido. Use AAA9999")]
-        [Column("PLACA", TypeName = "VARCHAR2(7)")]
-        public string Placa { get; set; }
+        public string Placa { get; set; } = string.Empty;
 
-        [Column("ESTADO", TypeName = "VARCHAR2(20)")]
+        [Column(TypeName = "decimal(18,2)")]
+        [Range(0, double.MaxValue)]
+        public decimal ValorDiaria { get; set; }
+
         public EstadoMoto Estado { get; set; } = EstadoMoto.Pronta;
+
+        public ICollection<Pedido> Pedidos { get; set; } = new List<Pedido>();
 
         public string Cor => Estado switch
         {
