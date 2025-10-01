@@ -4,7 +4,9 @@ API RESTful para gestão de locação de motocicletas, clientes e pedidos, desen
 =======
 
 ## Integrantes
-- GPT-5 Codex (automação)
+- Oscar Arias Neto - RM556936
+- Julia Martins Rebelles - RM554516
+- Nicolas Souza dos Santos - RM555571
 
 ## Domínio e Entidades
 O domínio representa uma locadora de motocicletas. As três entidades principais refletem responsabilidades do negócio:
@@ -33,15 +35,15 @@ Essa organização separa responsabilidades, facilita testes e mantém a API ali
 # Restaurar pacotes
 dotnet restore
 
-# Rodar a API (porta padrão 5000/5001)
-dotnet run --project MotoAPI.csproj
+# Rodar a API
+dotnet run
 ```
 A API utiliza banco InMemory, portanto não requer configuração adicional. Dados podem ser inseridos via endpoints.
 
 ## Documentação Swagger
 Após iniciar a aplicação, acesse:
 ```
-https://localhost:5001/swagger
+http://localhost:5016/swagger
 ```
 
 ## Exemplos de Uso
