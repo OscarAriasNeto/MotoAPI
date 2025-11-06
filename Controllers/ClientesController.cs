@@ -9,12 +9,15 @@ using Swashbuckle.AspNetCore.Filters;
 namespace MotoAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/clientes")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/clientes")]
     [Produces("application/json")]
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
         private readonly LinkGenerator _linkGenerator;
+
+        private string CurrentVersion => HttpContext?.GetRequestedApiVersion()?.ToString() ?? "1.0";
 
         public ClientesController(IClienteService clienteService, LinkGenerator linkGenerator)
         {
@@ -31,6 +34,13 @@ namespace MotoAPI.Controllers
         public async Task<ActionResult<PagedResponse<ResourceDto<ClienteResponseDto>>>> GetAsync([FromQuery] PaginationParameters pagination, CancellationToken cancellationToken)
         {
             var (items, total) = await _clienteService.GetPagedAsync(pagination.Page, pagination.PageSize, cancellationToken);
+            var metadata = new PaginationMetadata(pagination.Page, pagination.PageSize, total);
+
+            if (metadata.IsPageOutOfRange)
+            {
+                return NotFound(new { message = $"Página {pagination.Page} não disponível. Total de páginas: {metadata.TotalPages}." });
+            }
+
             var resources = items
                 .Select(ClienteResponseDto.FromEntity)
                 .Select(BuildClienteResource)
@@ -88,7 +98,7 @@ namespace MotoAPI.Controllers
 
             var created = await _clienteService.CreateAsync(cliente, cancellationToken);
             var resource = BuildClienteResource(ClienteResponseDto.FromEntity(created));
-            return CreatedAtRoute("GetClienteById", new { id = resource.Data.Id }, resource);
+            return CreatedAtRoute("GetClienteById", new { version = CurrentVersion, id = resource.Data.Id }, resource);
         }
 
         /// <summary>
@@ -151,19 +161,19 @@ namespace MotoAPI.Controllers
         {
             var resource = new ResourceDto<ClienteResponseDto>(cliente);
 
-            var self = _linkGenerator.GetUriByName(HttpContext, "GetClienteById", new { id = cliente.Id });
+            var self = _linkGenerator.GetUriByName(HttpContext, "GetClienteById", new { version = CurrentVersion, id = cliente.Id });
             if (!string.IsNullOrWhiteSpace(self))
             {
                 resource.Links.Add(new LinkDto(self, "self", HttpMethods.Get));
             }
 
-            var update = _linkGenerator.GetUriByName(HttpContext, "UpdateCliente", new { id = cliente.Id });
+            var update = _linkGenerator.GetUriByName(HttpContext, "UpdateCliente", new { version = CurrentVersion, id = cliente.Id });
             if (!string.IsNullOrWhiteSpace(update))
             {
                 resource.Links.Add(new LinkDto(update, "update", HttpMethods.Put));
             }
 
-            var delete = _linkGenerator.GetUriByName(HttpContext, "DeleteCliente", new { id = cliente.Id });
+            var delete = _linkGenerator.GetUriByName(HttpContext, "DeleteCliente", new { version = CurrentVersion, id = cliente.Id });
             if (!string.IsNullOrWhiteSpace(delete))
             {
                 resource.Links.Add(new LinkDto(delete, "delete", HttpMethods.Delete));
