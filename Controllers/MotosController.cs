@@ -31,6 +31,13 @@ namespace MotoAPI.Controllers
         public async Task<ActionResult<PagedResponse<ResourceDto<MotoResponseDto>>>> GetAsync([FromQuery] PaginationParameters pagination, CancellationToken cancellationToken)
         {
             var (items, total) = await _motoService.GetPagedAsync(pagination.Page, pagination.PageSize, cancellationToken);
+            var metadata = new PaginationMetadata(pagination.Page, pagination.PageSize, total);
+
+            if (metadata.IsPageOutOfRange)
+            {
+                return NotFound(new { message = $"Página {pagination.Page} não disponível. Total de páginas: {metadata.TotalPages}." });
+            }
+
             var resources = items
                 .Select(MotoResponseDto.FromEntity)
                 .Select(BuildMotoResource)

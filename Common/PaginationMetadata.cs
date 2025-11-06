@@ -10,5 +10,7 @@ namespace MotoAPI.Common
         public bool HasPrevious => Page > 1;
 
         public bool HasNext => Page < TotalPages;
+
+        public bool IsPageOutOfRange => TotalPages == 0 ? Page > 1 : Page > TotalPages;
     }
 }

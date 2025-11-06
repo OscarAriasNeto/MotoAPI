@@ -4,6 +4,7 @@ using MotoAPI.Data;
 using MotoAPI.Services;
 using MotoAPI.SwaggerExamples;
 using System.Reflection;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,10 +30,10 @@ builder.Services.AddSwaggerGen(options =>
     }
 
     options.EnableAnnotations();
-    // options.ExampleFilters();
+    options.ExampleFilters();
 });
 
-// builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateMotoRequestExample>();
+builder.Services.AddSwaggerExamplesFromAssemblyOf<CreateMotoRequestExample>();
 
 builder.Services.AddDbContext<MotoDbContext>(options =>
     options.UseInMemoryDatabase("MotoDb"));
