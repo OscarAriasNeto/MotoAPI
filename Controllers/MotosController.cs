@@ -9,12 +9,15 @@ using Swashbuckle.AspNetCore.Filters;
 namespace MotoAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/motos")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/motos")]
     [Produces("application/json")]
     public class MotosController : ControllerBase
     {
         private readonly IMotoService _motoService;
         private readonly LinkGenerator _linkGenerator;
+
+        private string CurrentVersion => HttpContext?.GetRequestedApiVersion()?.ToString() ?? "1.0";
 
         public MotosController(IMotoService motoService, LinkGenerator linkGenerator)
         {
@@ -98,7 +101,7 @@ namespace MotoAPI.Controllers
 
             var created = await _motoService.CreateAsync(moto, cancellationToken);
             var resource = BuildMotoResource(MotoResponseDto.FromEntity(created));
-            return CreatedAtRoute("GetMotoById", new { id = resource.Data.Id }, resource);
+            return CreatedAtRoute("GetMotoById", new { version = CurrentVersion, id = resource.Data.Id }, resource);
         }
 
         /// <summary>
@@ -164,19 +167,19 @@ namespace MotoAPI.Controllers
         {
             var resource = new ResourceDto<MotoResponseDto>(moto);
 
-            var self = _linkGenerator.GetUriByName(HttpContext, "GetMotoById", new { id = moto.Id });
+            var self = _linkGenerator.GetUriByName(HttpContext, "GetMotoById", new { version = CurrentVersion, id = moto.Id });
             if (!string.IsNullOrWhiteSpace(self))
             {
                 resource.Links.Add(new LinkDto(self, "self", HttpMethods.Get));
             }
 
-            var update = _linkGenerator.GetUriByName(HttpContext, "UpdateMoto", new { id = moto.Id });
+            var update = _linkGenerator.GetUriByName(HttpContext, "UpdateMoto", new { version = CurrentVersion, id = moto.Id });
             if (!string.IsNullOrWhiteSpace(update))
             {
                 resource.Links.Add(new LinkDto(update, "update", HttpMethods.Put));
             }
 
-            var delete = _linkGenerator.GetUriByName(HttpContext, "DeleteMoto", new { id = moto.Id });
+            var delete = _linkGenerator.GetUriByName(HttpContext, "DeleteMoto", new { version = CurrentVersion, id = moto.Id });
             if (!string.IsNullOrWhiteSpace(delete))
             {
                 resource.Links.Add(new LinkDto(delete, "delete", HttpMethods.Delete));

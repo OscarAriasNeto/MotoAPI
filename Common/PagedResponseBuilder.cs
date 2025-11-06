@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace MotoAPI.Common
@@ -10,8 +11,11 @@ namespace MotoAPI.Common
             var meta = new PaginationMetadata(parameters.Page, parameters.PageSize, totalItems);
             var response = new PagedResponse<T>(items, meta);
 
+            var version = httpContext.GetRequestedApiVersion()?.ToString() ?? "1.0";
+
             var selfLink = linkGenerator.GetUriByName(httpContext, routeName, new
             {
+                version,
                 page = parameters.Page,
                 pageSize = parameters.PageSize
             });
@@ -25,6 +29,7 @@ namespace MotoAPI.Common
             {
                 var previousLink = linkGenerator.GetUriByName(httpContext, routeName, new
                 {
+                    version,
                     page = parameters.Page - 1,
                     pageSize = parameters.PageSize
                 });
@@ -39,6 +44,7 @@ namespace MotoAPI.Common
             {
                 var nextLink = linkGenerator.GetUriByName(httpContext, routeName, new
                 {
+                    version,
                     page = parameters.Page + 1,
                     pageSize = parameters.PageSize
                 });
