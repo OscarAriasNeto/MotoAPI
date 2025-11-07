@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotoAPI", "MotoAPI.csproj", "{721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotoAPI.Tests", "MotoAPI.Tests\\MotoAPI.Tests.csproj", "{3F03E3B4-83C8-4B90-B879-8F4D63DF8793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MotoAPI.Tests", "MotoAPI.Tests\MotoAPI.Tests.csproj", "{3F03E3B4-83C8-4B90-B879-8F4D63DF8793}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,13 +15,9 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-                {721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-                {721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Release|Any CPU.Build.0 = Release|Any CPU
-                {3F03E3B4-83C8-4B90-B879-8F4D63DF8793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-                {3F03E3B4-83C8-4B90-B879-8F4D63DF8793}.Debug|Any CPU.Build.0 = Debug|Any CPU
-                {3F03E3B4-83C8-4B90-B879-8F4D63DF8793}.Release|Any CPU.ActiveCfg = Release|Any CPU
-                {3F03E3B4-83C8-4B90-B879-8F4D63DF8793}.Release|Any CPU.Build.0 = Release|Any CPU
-        EndGlobalSection
+		{721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{721EAB14-D12F-47B4-9364-6BE2A9DDBCC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
