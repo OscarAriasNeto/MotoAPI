@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using MotoAPI.Data;
 using MotoAPI.Middleware;
 using MotoAPI.Services;
+using MotoAPI.Options;
 using MotoAPI.SwaggerExamples;
 using MotoAPI.Versioning;
 using Swashbuckle.AspNetCore.Filters;
@@ -19,6 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<ApiKeyOptions>(builder.Configuration.GetSection(ApiKeyOptions.SectionName));
 
 builder.Services.AddApiVersioning(options =>
 {

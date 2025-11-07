@@ -30,6 +30,7 @@ Essa organização separa responsabilidades, facilita testes e mantém a API ali
 - HATEOAS em todos os recursos e coleções.
 - Versionamento de API (`/api/v{version}`) com documentação atualizada no Swagger.
 - Endpoint de health check em `/health`.
+- Segurança via API Key (`X-API-KEY`) documentada e validada pelo middleware dedicado, com configuração centralizada na seção `ApiKey` do `appsettings`.
 - Segurança via API Key (`X-API-KEY`) documentada e validada pelo middleware dedicado.
 - Endpoint de previsão de demanda com ML.NET.
 - Swagger/OpenAPI com exemplos de requisição/resposta e schemas gerados por XML docs.
@@ -43,6 +44,7 @@ dotnet restore
 # Rodar a API
 dotnet run
 ```
+A API utiliza banco InMemory, portanto não requer configuração adicional. Configure a chave de acesso em `appsettings.json` ou `appsettings.Development.json`, na seção `ApiKey:Value` (padrão `local-dev-api-key`), para autenticar requisições.
 A API utiliza banco InMemory, portanto não requer configuração adicional. Configure a chave de acesso em `appsettings.json` (padrão `local-dev-api-key`) para autenticar requisições.
 
 ## Documentação Swagger
