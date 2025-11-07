@@ -23,9 +23,9 @@ namespace MotoAPI.Services
         {
             var input = new MotoPriceData
             {
-                Ano = request.AnoFabricacao,
-                Quilometragem = request.Quilometragem,
-                Cilindrada = request.Cilindrada
+                Modelo = request.Modelo,
+                AnoFabricacao = request.AnoFabricacao,
+                Quilometragem = request.Quilometragem
             };
 
             return _predictionEngine.Value.Predict(input);
@@ -36,10 +36,11 @@ namespace MotoAPI.Services
             var context = new MLContext();
             var trainingData = context.Data.LoadFromEnumerable(GetTrainingData());
 
-            var pipeline = context.Transforms.Concatenate("Features",
-                    nameof(MotoPriceData.Ano),
-                    nameof(MotoPriceData.Quilometragem),
-                    nameof(MotoPriceData.Cilindrada))
+            var pipeline = context.Transforms.Categorical.OneHotEncoding("ModeloEncoded", nameof(MotoPriceData.Modelo))
+                .Append(context.Transforms.Concatenate("Features",
+                    "ModeloEncoded",
+                    nameof(MotoPriceData.AnoFabricacao),
+                    nameof(MotoPriceData.Quilometragem)))
                 .Append(context.Regression.Trainers.Sdca());
 
             var model = pipeline.Fit(trainingData);
@@ -48,26 +49,23 @@ namespace MotoAPI.Services
 
         private static IEnumerable<MotoPriceData> GetTrainingData()
         {
-            yield return new MotoPriceData { Ano = 2020, Quilometragem = 5_000, Cilindrada = 300, ValorDiaria = 180 };
-            yield return new MotoPriceData { Ano = 2018, Quilometragem = 15_000, Cilindrada = 250, ValorDiaria = 150 };
-            yield return new MotoPriceData { Ano = 2021, Quilometragem = 3_000, Cilindrada = 500, ValorDiaria = 220 };
-            yield return new MotoPriceData { Ano = 2016, Quilometragem = 25_000, Cilindrada = 300, ValorDiaria = 130 };
-            yield return new MotoPriceData { Ano = 2019, Quilometragem = 10_000, Cilindrada = 400, ValorDiaria = 190 };
+            yield return new MotoPriceData { Modelo = "Honda CG 160", AnoFabricacao = 2020, Quilometragem = 5_000, ValorDiaria = 120 };
+            yield return new MotoPriceData { Modelo = "Yamaha Fazer 250", AnoFabricacao = 2019, Quilometragem = 12_000, ValorDiaria = 150 };
+            yield return new MotoPriceData { Modelo = "Honda PCX 150", AnoFabricacao = 2021, Quilometragem = 4_000, ValorDiaria = 160 };
+            yield return new MotoPriceData { Modelo = "BMW G 310 GS", AnoFabricacao = 2022, Quilometragem = 3_500, ValorDiaria = 260 };
+            yield return new MotoPriceData { Modelo = "Yamaha NMax 160", AnoFabricacao = 2018, Quilometragem = 18_000, ValorDiaria = 130 };
         }
     }
 
     public class MotoPriceData
     {
-        [LoadColumn(0)]
-        public float Ano { get; set; }
+        public string Modelo { get; set; } = string.Empty;
 
-        [LoadColumn(1)]
+        public float AnoFabricacao { get; set; }
+
         public float Quilometragem { get; set; }
 
-        [LoadColumn(2)]
-        public float Cilindrada { get; set; }
-
-        [LoadColumn(3), ColumnName("Label")]
+        [ColumnName("Label")]
         public float ValorDiaria { get; set; }
     }
 
@@ -79,10 +77,10 @@ namespace MotoAPI.Services
 
     public class PredictMotoPriceRequest
     {
+        public string Modelo { get; set; } = string.Empty;
+
         public float AnoFabricacao { get; set; }
 
         public float Quilometragem { get; set; }
-
-        public float Cilindrada { get; set; }
     }
 }

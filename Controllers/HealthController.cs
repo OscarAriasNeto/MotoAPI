@@ -8,6 +8,9 @@ namespace MotoAPI.Controllers
     [Produces("application/json")]
     public class HealthController : ControllerBase
     {
+        /// <summary>
+        /// Retorna o status de saúde da aplicação.
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Get() => Ok(new { status = "Healthy" });

@@ -24,7 +24,7 @@ namespace MotoAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<MotoPricePrediction> PredictMotoDailyRate([FromBody] PredictMotoPriceRequest request)
         {
-            if (request is null)
+            if (request is null || string.IsNullOrWhiteSpace(request.Modelo))
             {
                 return BadRequest();
             }
