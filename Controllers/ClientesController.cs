@@ -9,7 +9,8 @@ using Swashbuckle.AspNetCore.Filters;
 namespace MotoAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/clientes")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/clientes")]
     [Produces("application/json")]
     public class ClientesController : ControllerBase
     {
