@@ -51,6 +51,7 @@ builder.Services.AddDbContext<MotoDbContext>(options =>
 builder.Services.AddScoped<IMotoService, MotoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddSingleton<IMotoPricePredictionService, MotoPricePredictionService>();
 
 var app = builder.Build();
 
