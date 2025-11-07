@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MotoAPI.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace MotoAPI.Middleware;
 
@@ -16,6 +17,11 @@ public class ApiKeyMiddleware
     {
         _next = next;
         _configuredKey = options.Value.Value;
+    private readonly IConfiguration _configuration;
+    public ApiKeyMiddleware(RequestDelegate next, IConfiguration configuration)
+    {
+        _next = next;
+        _configuration = configuration;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -39,6 +45,8 @@ public class ApiKeyMiddleware
         }
 
         if (!string.Equals(_configuredKey, extractedKey, StringComparison.Ordinal))
+        var configuredKey = _configuration.GetValue<string>("ApiKey:Value");
+        if (string.IsNullOrWhiteSpace(configuredKey) || !string.Equals(configuredKey, extractedKey, StringComparison.Ordinal))
         {
             await WriteErrorAsync(context, StatusCodes.Status403Forbidden, "Chave de API inválida.");
             return;
@@ -52,6 +60,12 @@ public class ApiKeyMiddleware
 
     private static bool IsSwaggerPath(PathString path)
         => path.HasValue && (path.StartsWithSegments("/swagger") || path.StartsWithSegments("/favicon.ico"));
+        => path.HasValue && path.Value is not null && path.Value.Equals("/health", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsSwaggerPath(PathString path)
+        => path.HasValue && path.Value is not null &&
+           (path.Value.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
+            path.Value.StartsWith("/favicon.ico", StringComparison.OrdinalIgnoreCase));
 
     private static async Task WriteErrorAsync(HttpContext context, int statusCode, string message)
     {
