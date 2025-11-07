@@ -13,10 +13,11 @@ O domínio representa uma locadora de motocicletas. As três entidades principai
 
 ## Arquitetura
 A solução segue uma arquitetura em camadas simples:
-- **Controllers**: expõem endpoints RESTful versionados (`/api/v1`) com paginação, HATEOAS e validações.
-- **Services**: camada de aplicação responsável por regras de negócio e acesso ao `DbContext`.
+- **Controllers**: expõem endpoints RESTful versionados (`/api/v{version}`) com paginação, HATEOAS, validações e integração com ML.NET.
+- **Services**: camada de aplicação responsável por regras de negócio, previsões de demanda e acesso ao `DbContext`.
 - **Data**: `MotoDbContext` com Entity Framework Core (InMemory para facilitar testes).
 - **Common/SwaggerExamples**: helpers para paginação, hiperlinks e exemplos usados no Swagger.
+- **Middleware**: proteção de todas as rotas (exceto `/health` e Swagger) com API Key.
 
 Essa organização separa responsabilidades, facilita testes e mantém a API alinhada às boas práticas REST (métodos HTTP, status codes, hiperlinks).
 
@@ -24,6 +25,11 @@ Essa organização separa responsabilidades, facilita testes e mantém a API ali
 - CRUD completo para motos, clientes e pedidos.
 - Paginação via `page` e `pageSize` com metadados e links de navegação.
 - HATEOAS em todos os recursos e coleções.
+- Versionamento de API (`/api/v{version}`) com documentação atualizada no Swagger.
+- Endpoint de health check em `/health`.
+- Segurança via API Key (`X-API-KEY`) documentada e validada pelo middleware dedicado, com configuração centralizada na seção `ApiKey` do `appsettings`.
+- Segurança via API Key (`X-API-KEY`) documentada e validada pelo middleware dedicado.
+- Endpoint de previsão de demanda com ML.NET.
 - Swagger/OpenAPI com exemplos de requisição/resposta e schemas gerados por XML docs.
 - Testes unitários (serviços) e de integração (controllers).
 
@@ -35,7 +41,8 @@ dotnet restore
 # Rodar a API (porta padrão 5000/5001)
 dotnet run --project MotoAPI.csproj
 ```
-A API utiliza banco InMemory, portanto não requer configuração adicional. Dados podem ser inseridos via endpoints.
+A API utiliza banco InMemory, portanto não requer configuração adicional. Configure a chave de acesso em `appsettings.json` ou `appsettings.Development.json`, na seção `ApiKey:Value` (padrão `local-dev-api-key`), para autenticar requisições.
+A API utiliza banco InMemory, portanto não requer configuração adicional. Configure a chave de acesso em `appsettings.json` (padrão `local-dev-api-key`) para autenticar requisições.
 
 ## Documentação Swagger
 Após iniciar a aplicação, acesse:
@@ -44,10 +51,13 @@ https://localhost:5001/swagger
 ```
 
 ## Exemplos de Uso
+Todas as chamadas autenticadas devem enviar o cabeçalho `X-API-KEY` com o valor configurado (por padrão `local-dev-api-key`).
+
 Criar moto:
 ```bash
 curl -X POST https://localhost:5001/api/v1/motos \
   -H "Content-Type: application/json" \
+  -H "X-API-KEY: local-dev-api-key" \
   -d '{
         "modelo": "Honda CB 500X",
         "anoFabricacao": 2024,
@@ -58,12 +68,14 @@ curl -X POST https://localhost:5001/api/v1/motos \
 ```
 Listar motos (pagina 1 com 5 itens):
 ```bash
-curl "https://localhost:5001/api/v1/motos?page=1&pageSize=5"
+curl "https://localhost:5001/api/v1/motos?page=1&pageSize=5" \
+  -H "X-API-KEY: local-dev-api-key"
 ```
 Criar cliente:
 ```bash
 curl -X POST https://localhost:5001/api/v1/clientes \
   -H "Content-Type: application/json" \
+  -H "X-API-KEY: local-dev-api-key" \
   -d '{
         "nome": "Maria Silva",
         "email": "maria.silva@email.com"
@@ -73,6 +85,7 @@ Criar pedido:
 ```bash
 curl -X POST https://localhost:5001/api/v1/pedidos \
   -H "Content-Type: application/json" \
+  -H "X-API-KEY: local-dev-api-key" \
   -d '{
         "clienteId": 1,
         "motoId": 1,
@@ -81,6 +94,23 @@ curl -X POST https://localhost:5001/api/v1/pedidos \
         "valorTotal": 559.70,
         "status": "Reservado"
       }'
+```
+
+Previsão de demanda com ML.NET:
+```bash
+curl -X POST https://localhost:5001/api/v1/analises/previsao-demanda \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: local-dev-api-key" \
+  -d '{
+        "valorDiaria": 120,
+        "mediaDiasUsoPorCliente": 9,
+        "quilometragemMediaMensal": 160
+      }'
+```
+
+Health check (não requer chave):
+```bash
+curl https://localhost:5001/health
 ```
 
 ## Testes
