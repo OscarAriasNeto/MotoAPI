@@ -1,12 +1,9 @@
 # MotoAPI
 
-API RESTful para gestão de locação de motocicletas, clientes e pedidos, desenvolvida em ASP.NET Core 8.0.413.
-=======
+API RESTful para gestão de locação de motocicletas, clientes e pedidos, desenvolvida em ASP.NET Core 8.
 
 ## Integrantes
-- Oscar Arias Neto - RM556936
-- Julia Martins Rebelles - RM554516
-- Nicolas Souza dos Santos - RM555571
+- GPT-5 Codex (automação)
 
 ## Domínio e Entidades
 O domínio representa uma locadora de motocicletas. As três entidades principais refletem responsabilidades do negócio:
@@ -35,15 +32,15 @@ Essa organização separa responsabilidades, facilita testes e mantém a API ali
 # Restaurar pacotes
 dotnet restore
 
-# Rodar a API
-dotnet run
+# Rodar a API (porta padrão 5000/5001)
+dotnet run --project MotoAPI.csproj
 ```
 A API utiliza banco InMemory, portanto não requer configuração adicional. Dados podem ser inseridos via endpoints.
 
 ## Documentação Swagger
 Após iniciar a aplicação, acesse:
 ```
-http://localhost:5016/swagger
+https://localhost:5001/swagger
 ```
 
 ## Exemplos de Uso
