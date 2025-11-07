@@ -1,4 +1,4 @@
-# MotoAPI
+# MotoAPI -- Ler até o final para entender o funcionamento
 
 API RESTful para gestão de locação de motocicletas, clientes e pedidos, desenvolvida em ASP.NET Core 8.0.413.
 =======
@@ -31,14 +31,30 @@ Essa organização separa responsabilidades, facilita testes e mantém a API ali
 - Testes unitários (serviços) e de integração (controllers).
 
 ## Executando o Projeto
-```bash
-# Restaurar pacotes
-dotnet restore
+### Pré-requisitos
+- [.NET SDK 8.0](https://dotnet.microsoft.com/download) instalado localmente.
+- Variável de ambiente `ASPNETCORE_ENVIRONMENT` opcional para alternar entre configurações (`Development` é o padrão recomendado para testes locais).
 
-# Rodar a API
-dotnet run
-```
-A API utiliza banco InMemory, portanto não requer configuração adicional. Dados podem ser inseridos via endpoints.
+### Passo a passo
+1. **Restaurar dependências**
+   ```bash
+   dotnet restore
+   ```
+
+2. **Configurar a API Key**
+   - Por padrão, o middleware de segurança verifica o header `X-API-KEY`.
+   - A chave esperada é definida na seção `Security:ApiKey` do `appsettings.json` (ou `appsettings.Development.json`).
+   - Para sobrepor via variável de ambiente utilize `Security__ApiKey`. Exemplo (Linux/macOS):
+     ```bash
+     export Security__ApiKey="chave-super-secreta"
+     ```
+
+3. **Executar a aplicação**
+   ```bash
+   dotnet run
+   ```
+
+A API utiliza banco InMemory, portanto não requer configuração adicional de persistência. Insira dados pelos endpoints autenticando-se com o header `X-API-KEY` configurado no passo anterior.
 
 ## Documentação Swagger
 Após iniciar a aplicação, acesse:
@@ -99,6 +115,7 @@ dotnet test
 ```
 
 Se preferir, é possível filtrar apenas uma categoria utilizando traits do xUnit, por exemplo `dotnet test --filter FullyQualifiedName~Integration` para rodar apenas os testes de integração.
+O motoAPI.Tests está dentro do MotoAPI pois não encontrei uma maneira melhor para enviar pelo github, mas o código só funciona retirarndo as partes de teste dentro do MotoAPI
 
 ## Estrutura do Repositório
 ```
@@ -110,6 +127,6 @@ MotoAPI/
 ├── Models/                 # Entidades de domínio
 ├── Services/               # Camada de serviços
 ├── SwaggerExamples/        # Exemplos utilizados no Swagger
-├── MotoAPI.Tests/          # Testes unitários e de integração
 └── Program.cs              # Configuração da aplicação
+MotoAPI.Tests/          # Testes unitários e de integração
 ```
