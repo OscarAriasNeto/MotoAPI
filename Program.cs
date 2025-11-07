@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using MotoAPI.Data;
 using MotoAPI.Services;
 using MotoAPI.SwaggerExamples;
+using System;
 using System.Reflection;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -60,6 +62,27 @@ app.UseSwaggerUI(options =>
 });
 
 app.UseHttpsRedirection();
+
+var apiKey = builder.Configuration["ApiKey"];
+const string apiKeyHeaderName = "X-API-KEY";
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase))
+    {
+        await next();
+        return;
+    }
+
+    if (string.IsNullOrEmpty(apiKey) || !context.Request.Headers.TryGetValue(apiKeyHeaderName, out var extractedKey) || !string.Equals(extractedKey, apiKey, StringComparison.Ordinal))
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        await context.Response.WriteAsync("API Key inválida ou ausente.");
+        return;
+    }
+
+    await next();
+});
 
 app.UseAuthorization();
 
