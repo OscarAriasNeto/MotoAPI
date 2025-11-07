@@ -87,10 +87,18 @@ curl -X POST https://localhost:5001/api/v1/pedidos \
 ```
 
 ## Testes
+Os testes ficam no projeto `MotoAPI.Tests` e cobrem duas camadas:
+
+- **Unitários**: validam a lógica dos serviços com `DbContext` em memória (ex.: paginação e verificação de placas da `MotoService`).
+- **Integração**: exercitam os endpoints reais via `WebApplicationFactory`, já configurando a `X-API-KEY` de teste para passar pelo middleware de segurança.
+
+Para executar toda a suíte utilize:
+
 ```bash
-# Testes unitários e de integração
 dotnet test
 ```
+
+Se preferir, é possível filtrar apenas uma categoria utilizando traits do xUnit, por exemplo `dotnet test --filter FullyQualifiedName~Integration` para rodar apenas os testes de integração.
 
 ## Estrutura do Repositório
 ```
