@@ -9,7 +9,8 @@ using Swashbuckle.AspNetCore.Filters;
 namespace MotoAPI.Controllers
 {
     [ApiController]
-    [Route("api/v1/pedidos")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/pedidos")]
     [Produces("application/json")]
     public class PedidosController : ControllerBase
     {
@@ -17,6 +18,8 @@ namespace MotoAPI.Controllers
         private readonly IClienteService _clienteService;
         private readonly IMotoService _motoService;
         private readonly LinkGenerator _linkGenerator;
+
+        private string CurrentVersion => HttpContext?.GetRequestedApiVersion()?.ToString() ?? "1.0";
 
         public PedidosController(IPedidoService pedidoService, IClienteService clienteService, IMotoService motoService, LinkGenerator linkGenerator)
         {
@@ -35,6 +38,13 @@ namespace MotoAPI.Controllers
         public async Task<ActionResult<PagedResponse<ResourceDto<PedidoResponseDto>>>> GetAsync([FromQuery] PaginationParameters pagination, CancellationToken cancellationToken)
         {
             var (items, total) = await _pedidoService.GetPagedAsync(pagination.Page, pagination.PageSize, cancellationToken);
+            var metadata = new PaginationMetadata(pagination.Page, pagination.PageSize, total);
+
+            if (metadata.IsPageOutOfRange)
+            {
+                return NotFound(new { message = $"Página {pagination.Page} não disponível. Total de páginas: {metadata.TotalPages}." });
+            }
+
             var resources = items
                 .Select(PedidoResponseDto.FromEntity)
                 .Select(BuildPedidoResource)
@@ -109,7 +119,7 @@ namespace MotoAPI.Controllers
 
             var created = await _pedidoService.CreateAsync(pedido, cancellationToken);
             var resource = BuildPedidoResource(PedidoResponseDto.FromEntity(created));
-            return CreatedAtRoute("GetPedidoById", new { id = resource.Data.Id }, resource);
+            return CreatedAtRoute("GetPedidoById", new { version = CurrentVersion, id = resource.Data.Id }, resource);
         }
 
         /// <summary>
@@ -185,19 +195,19 @@ namespace MotoAPI.Controllers
         {
             var resource = new ResourceDto<PedidoResponseDto>(pedido);
 
-            var self = _linkGenerator.GetUriByName(HttpContext, "GetPedidoById", new { id = pedido.Id });
+            var self = _linkGenerator.GetUriByName(HttpContext, "GetPedidoById", new { version = CurrentVersion, id = pedido.Id });
             if (!string.IsNullOrWhiteSpace(self))
             {
                 resource.Links.Add(new LinkDto(self, "self", HttpMethods.Get));
             }
 
-            var update = _linkGenerator.GetUriByName(HttpContext, "UpdatePedido", new { id = pedido.Id });
+            var update = _linkGenerator.GetUriByName(HttpContext, "UpdatePedido", new { version = CurrentVersion, id = pedido.Id });
             if (!string.IsNullOrWhiteSpace(update))
             {
                 resource.Links.Add(new LinkDto(update, "update", HttpMethods.Put));
             }
 
-            var delete = _linkGenerator.GetUriByName(HttpContext, "DeletePedido", new { id = pedido.Id });
+            var delete = _linkGenerator.GetUriByName(HttpContext, "DeletePedido", new { version = CurrentVersion, id = pedido.Id });
             if (!string.IsNullOrWhiteSpace(delete))
             {
                 resource.Links.Add(new LinkDto(delete, "delete", HttpMethods.Delete));
